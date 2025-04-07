@@ -1,0 +1,2 @@
+#!/bin/bash
+mysql -uC4131S25S01U38 -hcse-mysql-classes-01.cse.umn.edu -P3306 -p C4131S25S01U38

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Form Input</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<nav class="navbar">
+    <a href="/" class="logo"><img src="/img/favicon.ico" alt="CSCI4131 icon"></a>
+    <div class="nav-links">
+        <a href="/html/aboutme">About Me</a>
+        <a href="/html/myschedule">My Schedule</a>
+        <a href="/html/myform">Form Input</a>
+        <a href="/html/stocks">Stocks</a>
+    </div>
+</nav>
+<div class="main">
+    <h1>Form Input</h1>
+    <form method="post" action="/html/EventLog.html">
+        <fieldset>
+            <legend>Event Information</legend>
+            <div class="form-group">
+                <div>
+                    <label for="event">Title</label>
+                    <input type="text" name="event" id="event" pattern='^(?!.*[<>])[A-Za-z0-9\s\.,&#39;"!()-]{1,100}$'
+                           placeholder="Event Title" required>
+                </div>
+                <div>
+                    <label for="day">Day of the Week:</label>
+                    <input list="date" name="day" id="day" placeholder="Select a day"
+                           pattern="(?i)^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$" required>
+                </div>
+                <div>
+                    <label for="start">Start Time</label>
+                    <input type="time" name="start" id="start" required>
+                </div>
+                <div>
+                    <label for="end">End Time</label>
+                    <input type="time" name="end" id="end" required>
+                </div>
+                <div>
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" name="phone" id="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                           placeholder="123-456-7890" required>
+                </div>
+                <div>
+                    <label for="location">Location</label>
+                    <input type="text" name="location" id="location" placeholder="Keller Hall" required>
+                </div>
+                <div>
+                    <label for="url">URL</label>
+                    <input type="url" name="url" id="url" placeholder="https://example.com" required>
+                </div>
+                <button type="submit">Submit</button>
+            </div>
+            <datalist id="date">
+                <option value="Monday">
+                <option value="Tuesday">
+                <option value="Wednesday">
+                <option value="Thursday">
+                <option value="Friday">
+                <option value="Saturday">
+                <option value="Sunday">
+            </datalist>
+        </fieldset>
+    </form>
+</div>
+<footer>
+    <div class="footer-container">
+        <div class="footer-left">
+            <div class="footer-links">
+                <a href="https://www.linkedin.com/in/gustavo-sakamoto-de-toledo-3120a0240/">LinkedIn</a>
+                <a href="mailto:gustavosakamotox@gmail.com">Email</a>
+                <a href="https://www.instagram.com/gustavo.sakamoto.toledo/">Instagram</a>
+            </div>
+        </div>
+    </div>
+    <p>&copy; Copyright 2025 by Gustavo Sakamoto de Toledo</p>
+</footer>
+</body>
+</html>
