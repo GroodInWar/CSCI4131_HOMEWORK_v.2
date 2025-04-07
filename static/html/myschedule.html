@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>My Schedule</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACGHxdmtESL4m-tpI_fz-ss1s8E46JN_g&callback=initMap&libraries=places"
+            async defer></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/script_myschedule.js"></script>
+    <link rel="icon" href="/img/favicon.ico" type="img/x-icon">
+</head>
+<body>
+<nav class="navbar">
+    <a href="/" class="logo"><img src="/img/favicon.ico" alt="CSCI4131 icon"></a>
+    <div class="nav-links">
+        <a href="/about">About Me</a>
+        <a href="/schedule">My Schedule</a>
+        <a href="/form">Form Input</a>
+        <a href="/stocks">Stock</a>
+    </div>
+</nav>
+<h1>My Schedule</h1>
+<div class="main schedule-main">
+    <div class="main-top-wrapper">
+        <div class="main-left">
+            <table>
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Title</th>
+                    <th>Time (Start - End)</th>
+                    <th>Location</th>
+                    <th>Phone Number</th>
+                    <th>URL</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th ROWSPAN="4">Monday</th>
+                    <td>CSCI 4271W (011) - Laboratory</td>
+                    <td>10:10 - 11:00 AM</td>
+                    <td class="locations">Walter Library B28</td>
+                    <td>612-626-7526</td>
+                    <td><a href="https://umtc.catalog.prod.coursedog.com/courses/8188141">CSCI 4271W Info.</a></td>
+                </tr>
+                <tr>
+                    <td>CSCI 4131 (001) - Lecture</td>
+                    <td>11:15 - 12:30 PM</td>
+                    <td class="locations">Anderson Hall 350</td>
+                    <td>612-625-8207</td>
+                    <td><a href="https://umtc.catalog.prod.coursedog.com/courses/7906541">CSCI 4131 Info.</a></td>
+                </tr>
+                <tr>
+                    <td>Rock Climbing</td>
+                    <td>2:00 - 4:00 PM</td>
+                    <td class="locations">Minneapolis RecWell</td>
+                    <td>612-626-9222</td>
+                    <td><a href="https://recwell.umn.edu/">RecWell Info.</a></td>
+                </tr>
+                <tr>
+                    <td>Certification Study Session</td>
+                    <td>5:00 - 8:00 PM</td>
+                    <td class="locations">Home</td>
+                    <td>320-291-6949</td>
+                    <td><a href="https://tryhackme.com/r/dashboard">TryHackMe Info.</a></td>
+                </tr>
+                <tr>
+                    <th ROWSPAN="2">Tuesday</th>
+                    <td>CSCI 4271W (011) - Lecture</td>
+                    <td>2:30 - 3:45 PM</td>
+                    <td class="locations">Keller Hall 3-115</td>
+                    <td>612-626-7526</td>
+                    <td><a href="https://umtc.catalog.prod.coursedog.com/courses/8188141">CSCI 4271W Info.</a></td>
+                </tr>
+                <tr>
+                    <td>Certification Study Session</td>
+                    <td>5:00 - 8:00 PM</td>
+                    <td class="locations">Home</td>
+                    <td>320-291-6949</td>
+                    <td><a href="https://tryhackme.com/r/dashboard">TryHackMe Info.</a></td>
+                </tr>
+                <tr>
+                    <th ROWSPAN="3">Wednesday</th>
+                    <td>CSCI 4131 (001) - Lecture</td>
+                    <td>11:15 - 12:30 PM</td>
+                    <td class="locations">Anderson Hall 350</td>
+                    <td>612-625-8207</td>
+                    <td><a href="https://umtc.catalog.prod.coursedog.com/courses/7906541">CSCI 4131 Info.</a></td>
+                </tr>
+                <tr>
+                    <td>Rock Climbing</td>
+                    <td>2:00 - 4:00 PM</td>
+                    <td class="locations">Minneapolis RecWell</td>
+                    <td>612-626-9222</td>
+                    <td><a href="https://recwell.umn.edu/">RecWell Info.</a></td>
+                </tr>
+                <tr>
+                    <td>Certification Study Session</td>
+                    <td>5:00 - 8:00 PM</td>
+                    <td class="locations">Home</td>
+                    <td>320-291-6949</td>
+                    <td><a href="https://tryhackme.com/r/dashboard">TryHackMe Info.</a></td>
+                </tr>
+                <tr>
+                    <th ROWSPAN="2">Thursday</th>
+                    <td>CSCI 4271W (011) - Lecture</td>
+                    <td>2:30 - 3:45 PM</td>
+                    <td class="locations">Keller Hall 3-115</td>
+                    <td>612-626-7526</td>
+                    <td><a href="https://umtc.catalog.prod.coursedog.com/courses/8188141">CSCI 4271W Info.</a></td>
+                </tr>
+                <tr>
+                    <td>Certification Study Session</td>
+                    <td>5:00 - 8:00 PM</td>
+                    <td class="locations">Home</td>
+                    <td>320-291-6949</td>
+                    <td><a href="https://tryhackme.com/r/dashboard">TryHackMe Info.</a></td>
+                </tr>
+                <tr>
+                    <th ROWSPAN="2">Friday</th>
+                    <td>Starbucks Shift</td>
+                    <td>9:00 - 5:00 PM</td>
+                    <td class="locations">164 E Broadway - Mall of America, Bloomington, MN 55425</td>
+                    <td>952-854-1922</td>
+                    <td>
+                        <a href="https://www.starbucks.com/store-locator/store/2705-84660/mall-of-america-first-level-164-e-broadway-suite-e-164-bloomington-mn-55425551">Starbucks
+                            Info.</a></td>
+                </tr>
+                <tr>
+                    <td>Hangout with Girlfriend</td>
+                    <td>6:00 - 10:00 PM</td>
+                    <td class="locations">Online</td>
+                    <td>320-291-6949</td>
+                    <td><a href="https://www.whatsapp.com/">WhatsApp Info.</a></td>
+                </tr>
+                <tr>
+                    <th ROWSPAN="2">Saturday</th>
+                    <td>Starbucks Shift</td>
+                    <td>9:00 - 5:00 PM</td>
+                    <td class="locations">164 E Broadway - Mall of America, Bloomington, MN 55425</td>
+                    <td>952-854-1922</td>
+                    <td>
+                        <a href="https://www.starbucks.com/store-locator/store/2705-84660/mall-of-america-first-level-164-e-broadway-suite-e-164-bloomington-mn-55425551">Starbucks
+                            Info.</a></td>
+                </tr>
+                <tr>
+                    <td>Hangout with Girlfriend</td>
+                    <td>6:00 - 10:00 PM</td>
+                    <td class="locations">Online</td>
+                    <td>320-291-6949</td>
+                    <td><a href="https://www.whatsapp.com/">WhatsApp Info.</a></td>
+                </tr>
+                <tr>
+                    <th>Sunday</th>
+                    <td>Starbucks Shift</td>
+                    <td>9:00 - 5:00 PM</td>
+                    <td class="locations">164 E Broadway - Mall of America, Bloomington, MN 55425</td>
+                    <td>952-854-1922</td>
+                    <td>
+                        <a href="https://www.starbucks.com/store-locator/store/2705-84660/mall-of-america-first-level-164-e-broadway-suite-e-164-bloomington-mn-55425551">Starbucks
+                            Info.</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="main-right">
+            <div class="image-preview">
+                <img src="/img/walter.jpg" alt="Walter Hall">
+                <img src="/img/anderson.jpg" alt="Anderson Hall" hidden="hidden">
+                <img src="/img/recwell.jpg" alt="RecWell" hidden="hidden">
+                <img src="/img/home.jpg" alt="Home" hidden="hidden">
+                <img src="/img/online.jpeg" alt="Online" hidden="hidden">
+                <img src="/img/moa.jpg" alt="Mall of America" hidden="hidden">
+                <img src="/img/keller.jpg" alt="Keller Hall" hidden="hidden">
+            </div>
+            <button class="previous">Previous</button>
+            <button class="next">Next</button>
+        </div>
+    </div>
+    <div class="main-bottom">
+        <div class="main-bottom-left">
+            <div id="map"></div>
+        </div>
+        <div class="main-bottom-right">
+            <form id="map_search">
+                <fieldset>
+                    <legend>Directions</legend>
+                    <label for="destination">Destination:</label>
+                    <input type="text" name="destination" id="destination" required>
+                    <div class="radio-group">
+                        <label for="driving">
+                            <input type="radio" name="direction" id="driving" value="DRIVING" checked>
+                            DRIVING
+                        </label>
+                        <label for="walking">
+                            <input type="radio" name="direction" id="walking" value="WALKING">
+                            WALKING
+                        </label>
+                        <label for="transit">
+                            <input type="radio" name="direction" id="transit" value="TRANSIT">
+                            TRANSIT
+                        </label>
+                    </div>
+                    <input type="submit" value="Get Directions">
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+<footer>
+    <div class="footer-container">
+        <div class="footer-left">
+            <div class="footer-links">
+                <a href="https://www.linkedin.com/in/gustavo-sakamoto-de-toledo-3120a0240/">LinkedIn</a>
+                <a href="mailto:gustavosakamotox@gmail.com">Email</a>
+                <a href="https://www.instagram.com/gustavo.sakamoto.toledo/">Instagram</a>
+            </div>
+        </div>
+    </div>
+    <p>&copy; Copyright 2025 by Gustavo Sakamoto de Toledo</p>
+</footer>
+</body>
+</html>
