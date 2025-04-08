@@ -19,17 +19,11 @@ const imgDir = path.join(staticDir, 'img');
     DATABASE
  */
 const conn = mysql.createConnection({
-    host: 'cse-mysql-classes-01.cse.umn.edu',
-    port: 3306,
-    user: 'C4131S25S01U38',
-    password: 'StrongPassword123',
-    database: 'C4131S25S01U38',
 });
 conn.connect((err) => {
     if (err) {
         console.error('Error connecting: ' + err.message);
     }
-    console.log('Connected as id ' + conn.threadId);
     console.log('='.repeat(width));
 });
 

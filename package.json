@@ -12,21 +12,11 @@
     "axios": "^1.8.4",
     "express": "^5.1.0",
     "morgan": "^1.10.0",
-    "mysql2": "^3.14.0",
-    "path": "^0.12.7"
   },
   "name": "csci4131_homework",
   "version": "1.0.0",
   "main": "server.js",
   "author": "Gustavo Sakamoto de Toledo",
   "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/GroodInWar/CSCI4131_HOMEWORK_v.2.git"
-  },
-  "bugs": {
-    "url": "https://github.com/GroodInWar/CSCI4131_HOMEWORK_v.2/issues"
-  },
-  "homepage": "https://github.com/GroodInWar/CSCI4131_HOMEWORK_v.2#readme",
   "description": ""
 }
