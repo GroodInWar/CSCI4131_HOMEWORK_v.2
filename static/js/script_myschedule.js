@@ -1,77 +1,114 @@
-$(function () {
-    const $locations = $(".locations");
-    const $pictures = $(".image-preview > img");
-    const loc_dict = {
-        "Walter Library B28": "walter.jpg",
-        "Anderson Hall 350": "anderson.jpg",
-        "Minneapolis RecWell": "recwell.jpg",
-        "Home": "home.jpg",
-        "Keller Hall 3-115": "keller.jpg",
-        "164 E Broadway - Mall of America, Bloomington, MN 55425": "moa.jpg",
-        "Online": "online.jpeg"
-    };
+// script_myschedule.js
+$(document).ready(async () => {
+    try {
+        const response = await fetch('/event', { method: 'GET' });
+        if (!response.ok) {
+            console.log(`HTTP error! status: ${response.status}`);
+        }
+        const events = await response.json();
+        const tbody = document.querySelector('tbody');
+        tbody.innerHTML = '';
 
-    // Collect all locations
-    const scheduleLocations = [];
-    $locations.each(function() {
-        scheduleLocations.push($(this).text().trim());
-    });
+        // Group events by day with proper ordering
+        const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday',
+            'Friday', 'Saturday', 'Sunday'];
+        const groupedEvents = events.reduce((acc, event) => {
+            const day = event.day;
+            if (!acc[day]) acc[day] = [];
+            acc[day].push(event);
+            return acc;
+        }, {});
 
-    // Map locations to their corresponding image
-    const scheduleImages = scheduleLocations.map(address => {
-        const imgPath = loc_dict[address];
-        return $(`.image-preview img[src="/img/${imgPath}"]`)[0];
-    });
+        // Create table rows with proper rowspans
+        dayOrder.forEach(day => {
+            const dayEvents = groupedEvents[day] || [];
+            if (dayEvents.length === 0) return;
 
-    let currentImageIndex = 0;
+            dayEvents.forEach((event, index) => {
+                const row = document.createElement('tr');
 
-    // Display image at given index
-    function showImage(index) {
-        $pictures.hide();
-        $(scheduleImages[index]).show();
-        currentImageIndex = index;
+                if (index === 0) {
+                    // First row with day and rowspan
+                    row.innerHTML = `
+                        <td rowspan="${dayEvents.length}">${escapeHtml(day)}</td>
+                        ${createRow(event)}
+                    `;
+                } else {
+                    // Subsequent rows without day
+                    row.innerHTML = createRow(event);
+                }
+
+                tbody.appendChild(row);
+            });
+        });
+
+    } catch (error) {
+        console.error('Error loading schedule:', error);
+        const errorRow = document.createElement('tr');
+        errorRow.innerHTML = `
+            <td colspan="7" class="error-message">
+                Failed to load schedule: ${escapeHtml(error.message)}
+            </td>
+        `;
+        document.querySelector('tbody').prepend(errorRow);
     }
-
-    // Default image
-    showImage(0);
-
-    // Next button click handler
-    $(".next").click(function() {
-        currentImageIndex = (currentImageIndex + 1) % scheduleImages.length;
-        showImage(currentImageIndex);
-    });
-
-    // Previous button click handler
-    $(".previous").click(function() {
-        currentImageIndex = (currentImageIndex - 1 + scheduleImages.length) % scheduleImages.length;
-        showImage(currentImageIndex);
-    });
-
-    // Handle location hover
-    $locations.each(function(index) {
-        const $location = $(this);
-        const address = scheduleLocations[index];
-        const imgPath = loc_dict[address];
-
-        if (!imgPath) return;
-
-        // Create thumbnail
-        const $thumbnail = $("<img>", {
-            class: "thumbnail",
-            src: `/img/${imgPath}`,
-            alt: address,
-        }).hide();
-
-        $location.hover(
-            // Mouseenter: show thumbnail and update main image
-            function() {
-                $thumbnail.appendTo($location).show();
-                showImage(index);
-            },
-            // Mouseleave: remove thumbnail
-            function() {
-                $thumbnail.hide().detach();
-            }
-        );
-    });
 });
+
+// Delete button handling with event delegation
+$(document).on('click', '.delete-button', async function() {
+    try {
+        const id = $(this).attr('id');
+        const response = await fetch('/event', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id })
+        });
+
+        if (!response.ok) {
+            console.log(`HTTP error! status: ${response.status}`);
+        }
+
+        // Remove the row from DOM
+        const row = $(this).closest('tr');
+        const dayRow = row.prev('tr').find('td[rowspan]');
+
+        if (dayRow.length) {
+            const rowspan = parseInt(dayRow.attr('rowspan'));
+            if (rowspan > 1) {
+                dayRow.attr('rowspan', rowspan - 1);
+            } else {
+                dayRow.parent().remove();
+            }
+        }
+        row.remove();
+
+        alert('Event deleted successfully');
+    } catch (error) {
+        console.error('Delete failed:', error);
+        alert('Failed to delete event: ' + error.message);
+    }
+});
+
+// XSS prevention
+function escapeHtml(unsafe) {
+    if (typeof unsafe !== 'string') return unsafe;
+    return unsafe
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/\//g, '&#x2F;');
+}
+
+// Table row creation
+function createRow(row) {
+    return `
+        <td>${escapeHtml(row.event)}</td>
+        <td>${escapeHtml(row.start)} - ${escapeHtml(row.end)}</td>
+        <td>${escapeHtml(row.location)}</td>
+        <td>${escapeHtml(row.phone)}</td>
+        <td><a href="${escapeHtml(row.url)}" target="_blank">Link</a></td>
+        <td><button class="delete-button" id="${row.id}">Delete</button></td>
+    `;
+}

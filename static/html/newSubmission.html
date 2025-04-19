@@ -10,7 +10,7 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACGHxdmtESL4m-tpI_fz-ss1s8E46JN_g&callback=initMap&libraries=places"
             async defer></script>
     <script src="/js/map.js"></script>
-    <script src="/js/script_myschedule.js"></script>
+    <script src="/js/newsubmission.js"></script>
     <link rel="icon" href="/img/favicon.ico" type="img/x-icon">
 </head>
 <body>
@@ -23,7 +23,7 @@
         <a href="/stocks">Stock</a>
     </div>
 </nav>
-<h1>My Schedule</h1>
+<h1>New Event Submitted Successfully</h1>
 <div class="main schedule-main">
     <div class="main-top-wrapper">
         <div class="main-left">
@@ -36,41 +36,12 @@
                     <th>Location</th>
                     <th>Phone Number</th>
                     <th>URL</th>
-                    <th>Action</th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody id="table-body">
                 </tbody>
             </table>
-        </div>
-    </div>
-    <div class="main-bottom">
-        <div class="main-bottom-left">
-            <div id="map"></div>
-        </div>
-        <div class="main-bottom-right">
-            <form id="map_search">
-                <fieldset>
-                    <legend>Directions</legend>
-                    <label for="destination">Destination:</label>
-                    <input type="text" name="destination" id="destination" required>
-                    <div class="radio-group">
-                        <label for="driving">
-                            <input type="radio" name="direction" id="driving" value="DRIVING" checked>
-                            DRIVING
-                        </label>
-                        <label for="walking">
-                            <input type="radio" name="direction" id="walking" value="WALKING">
-                            WALKING
-                        </label>
-                        <label for="transit">
-                            <input type="radio" name="direction" id="transit" value="TRANSIT">
-                            TRANSIT
-                        </label>
-                    </div>
-                    <input type="submit" value="Get Directions">
-                </fieldset>
-            </form>
+            <button id="redirect-button">Submit another event</button>
         </div>
     </div>
 </div>
