@@ -9,6 +9,7 @@ const mysql = require('mysql2');
 const sanitizeHtml = require('sanitize-html');
 const rfs = require('rotating-file-stream');
 const uuid = require('node-uuid');
+const methodOverride = require('method-override');
 
 const CRLF = '\r\n';
 const app = express();
@@ -27,7 +28,7 @@ const accessLogStream = rfs.createStream('access.log', {
     interval: '1d', path: path.join(__dirname, 'logs/access.log')
 })
 const staticDir = path.join(__dirname, 'static');
-const htmlDir = (path.join(staticDir, 'html'));
+const htmlDir = path.join(staticDir, 'html');
 const jsDir = path.join(staticDir, 'js');
 const cssDir = path.join(staticDir, 'css');
 const imgDir = path.join(staticDir, 'img');
@@ -35,13 +36,18 @@ const imgDir = path.join(staticDir, 'img');
 /*
     DATABASE
  */
-const pool = mysql.createPool({
+const connection = mysql.createConnection({
     host: db_credentials.host,
     user: db_credentials.user,
     password: db_credentials.password,
     port: db_credentials.port,
     database: db_credentials.database,
 });
+/*
+    Preprocessor
+ */
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 
 /*
     LOGS
@@ -68,6 +74,7 @@ app.use('/css', express.static(cssDir));
 app.use('/img', express.static(imgDir));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(methodOverride('_method'));
 const validateEventInput = (req, res, next) => {
     const requiredFields = ['event', 'day', 'start', 'end', 'phone', 'location', 'url'];
     const missingFields = requiredFields.filter((field) => !req.body[field]);
@@ -97,6 +104,7 @@ app.route('/form')
 
 app.route('/schedule')
     .get((req, res) => res.sendFile(path.join(htmlDir, 'myschedule.html')));
+
 app.route('/stocks')
     .get((req, res) => res.sendFile(path.join(htmlDir, 'stocks.html')));
 
@@ -104,11 +112,10 @@ app.route('/')
     .get((req, res) => res.sendFile(path.join(htmlDir, 'index.html')));
 
 /*
-    Schedule Database
+    Schedule Database Collection Routes
  */
 app.route('/event')
     .post(validateEventInput, (req, res) => {
-        const connection = mysql.createConnection(db_credentials);
         const sanitizedData = {
             event: sanitizeHtml(req.body.event),
             day: sanitizeHtml(req.body.day),
@@ -119,96 +126,116 @@ app.route('/event')
             url: sanitizeHtml(req.body.url),
         };
 
-        connection.connect(err => {
+        connection.query('INSERT schedule SET ?', sanitizedData, (err) => {
             if (err) {
-                console.error('Connection error:', err);
-                return res.status(500).json({ error: 'Database connection failed' });
+                console.error('Database error:', err);
+                return res.status(500).json({error: 'Database error'});
             }
 
-            connection.query('INSERT schedule SET ?', sanitizedData, (err) => {
-                connection.end(); // Close connection after query
-
+            // File handling remains the same
+            fs.readFile(path.join(htmlDir, 'newSubmission.html'), 'utf8', (err, htmlFileContents) => {
                 if (err) {
-                    console.error('Database error:', err);
-                    return res.status(500).json({ error: 'Database error' });
+                    console.error('File read error:', err);
+                    return res.status(500).send('Internal server error');
                 }
 
-                // File handling remains the same
-                fs.readFile(path.join(htmlDir, 'newSubmission.html'), 'utf8', (err, htmlFileContents) => {
-                    if (err) {
-                        console.error('File read error:', err);
-                        return res.status(500).send('Internal server error');
-                    }
+                const newHtmlRow = `
+                    <tr>
+                        <td>${escapeHtml(sanitizedData.day)}</td>
+                        <td>${escapeHtml(sanitizedData.event)}</td>
+                        <td>${escapeHtml(sanitizedData.start)} - ${escapeHtml(sanitizedData.end)}</td>
+                        <td>${escapeHtml(sanitizedData.location)}</td>
+                        <td>${escapeHtml(sanitizedData.phone)}</td>
+                        <td><a href="${encodeURI(sanitizedData.url)}" target="_blank">Link</a></td>
+                    </tr>
+                `;
+                const updatedHtml = htmlFileContents.replace(
+                    '<tbody id="table-body">',
+                    `<tbody id="table-body">\n${newHtmlRow}`
+                );
 
-                    const newHtmlRow = `
-                        <tr>
-                            <td>${escapeHtml(sanitizedData.day)}</td>
-                            <td>${escapeHtml(sanitizedData.event)}</td>
-                            <td>${escapeHtml(sanitizedData.start)} - ${escapeHtml(sanitizedData.end)}</td>
-                            <td>${escapeHtml(sanitizedData.location)}</td>
-                            <td>${escapeHtml(sanitizedData.phone)}</td>
-                            <td><a href="${encodeURI(sanitizedData.url)}" target="_blank">Link</a></td>
-                        </tr>
-                    `;
-                    const updatedHtml = htmlFileContents.replace(
-                        '<tbody id="table-body">',
-                        `<tbody id="table-body">\n${newHtmlRow}`
-                    );
-
-                    res.status(201).type('html').send(updatedHtml);
-                });
+                res.status(201).type('html').send(updatedHtml);
             });
         });
     })
     .get((req, res) => {
-        const connection = mysql.createConnection(db_credentials);
-
-        connection.connect(err => {
+        connection.query('SELECT * FROM schedule', (err, rows) => {
             if (err) {
-                console.error('Connection error:', err);
-                return res.status(500).json({ error: 'Database connection failed' });
+                console.error('Database error:', err);
+                return res.status(500).json({error: 'Database error'});
             }
-
-            connection.query('SELECT * FROM schedule', (err, rows) => {
-                connection.end();
-
-                if (err) {
-                    console.error('Database error:', err);
-                    return res.status(500).json({ error: 'Database error' });
-                }
-
-                res.status(200).json(rows);
-            });
+            res.status(200).json(rows);
         });
     })
     .delete((req, res) => {
-        const connection = mysql.createConnection(db_credentials);
-        const { id } = req.body;
+        const {id} = req.body;
 
         if (!id) {
-            return res.status(400).json({ error: 'Missing event ID' });
+            return res.status(400).json({error: 'Missing event ID'});
         }
 
-        connection.connect(err => {
+        connection.query('DELETE FROM schedule WHERE id = ?', [id], (err, result) => {
             if (err) {
-                console.error('Connection error:', err);
-                return res.status(500).json({ error: 'Database connection failed' });
+                console.error('Database error:', err);
+                return res.status(500).json({error: 'Database error'});
             }
 
-            connection.query('DELETE FROM schedule WHERE id = ?', [id], (err, result) => {
-                connection.end();
+            if (result.affectedRows === 0) {
+                return res.status(404).json({error: 'Event not found'});
+            }
 
-                if (err) {
-                    console.error('Database error:', err);
-                    return res.status(500).json({ error: 'Database error' });
-                }
+            res.status(200).json({message: 'Event deleted successfully'});
+        });
+    });
 
-                if (result.affectedRows === 0) {
-                    return res.status(404).json({ error: 'Event not found' });
-                }
+app.route('/event/:id')
+    .patch(validateEventInput, (req, res) => {
+        const eventId = req.params.id;
 
-                res.status(200).json({ message: 'Event deleted successfully' });
-            });
+        if (!eventId || isNaN(eventId)) {
+            return res.status(400).json({ error: 'Invalid event ID format' });
+        }
+
+        const sanitizedData = {
+            event: sanitizeHtml(req.body.event),
+            day: sanitizeHtml(req.body.day),
+            start: sanitizeHtml(req.body.start),
+            end: sanitizeHtml(req.body.end),
+            phone: sanitizeHtml(req.body.phone),
+            location: sanitizeHtml(req.body.location),
+            url: sanitizeHtml(req.body.url),
+        };
+
+        connection.query('UPDATE schedule SET ? WHERE id = ?',
+            [sanitizedData, eventId],
+            (err) => {
+                if (err) return res.status(500).json({ error: 'Database error' });
+                res.redirect('/schedule');
+            }
+        );
+    });
+
+app.route('/editSchedule/:EventId')
+    .get((req, res) => {
+        const eventId = req.params.EventId;
+
+        // No event ID or Not a number
+        if (!eventId || isNaN(eventId)) {
+            return res.status(400).json({ error: 'Invalid event ID format' });
+        }
+
+        connection.query('SELECT * FROM schedule WHERE id = ?', [eventId], (err, results) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({error: 'Database error'});
+            }
+
+            // No event matches the requested ID
+            if (results.length === 0) {
+                return res.status(404).json({error: 'Event not found'});
+            }
+
+            res.render('pages/editSchedule', { row: results[0] });
         });
     });
 
@@ -257,35 +284,41 @@ app.use((req, res) => {
 /*
     Server Interface
  */
-const server = app.listen(port, () => {
-    console.log('='.repeat(width));
-    // noinspection HttpUrlsUsage
-    console.log(`Listening on port http://${hostname}:${port}`);
-    console.log('='.repeat(width));
-});
+connection.connect((err) => {
+    console.error('='.repeat(width));
+    console.log('[+] Server Initiating...');
+    if (err) {
+        console.error('[-] Failed to connect to database:', err);
+        process.exit(1);
+    }
 
-process.on('SIGINT', () => {
-    console.log(`${CRLF}Closing database connection and shutting down`);
     console.log(`=`.repeat(width));
-    pool.end(err => {
-        if (err) console.error('Error closing connection:', err.message);
-        server.close(() => {
-            console.log('Server terminated');
-            console.log(`=`.repeat(width));
-            process.exit(0);
+    console.log('[+] Connected to database.');
+
+    const server = app.listen(port, () => {
+        console.log('='.repeat(width));
+        console.log(`[+] Listening on port http://${hostname}:${port}.`);
+        console.log('='.repeat(width));
+    });
+
+    process.on('SIGINT', () => {
+        console.log(`${CRLF}[+] Closing database connection and shutting down.`);
+        console.log(`=`.repeat(width));
+        connection.end(err => {
+            if (err) console.error('[-] Error closing connection:', err.message);
+            server.close(() => {
+                console.log('[+] Server terminated');
+                console.log(`=`.repeat(width));
+                process.exit(0);
+            });
         });
     });
 });
 
-process.on('SIGTERM', () => {
-    console.log(`${CRLF}Received SIGTERM. Closing database connection`);
-    console.log(`=`.repeat(width));
-    pool.end(err => {
-        if (err) console.error('Error closing connection:', err.message);
-        server.close(() => {
-            console.log('Server terminated');
-            console.log(`=`.repeat(width));
-            process.exit(0);
-        });
-    });
+connection.on('error', (err) => {
+   if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+       console.error('[-] Database connection was closed.');
+   } else {
+       console.error('[-] Database connection error:', err);
+   }
 });

@@ -1,0 +1,78 @@
+//- views/pages/editSchedule.pug
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport"
+            content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible"
+            content="ie=edge")
+        title Edit #{row.event}
+        link(rel="icon"
+            href="/img/favicon.ico"
+            type="img/x-icon")
+        link(rel="stylesheet"
+            href="/css/styles.css")
+    body
+        include ../partials/header
+        section(class="main")
+            h1 Edit #{row.event}
+            form(method="post" action=`/event/${row.id}?_method=PATCH`)
+                input(type="hidden" name="_method" value="PATCH")
+                fieldset
+                    legend Edit Event
+                    div(class="form-group")
+                        div
+                            label(for="event") Title:
+                            input(type="text"
+                                name="event"
+                                id="event"
+                                pattern='^(?!.*[<>])[A-Za-z0-9\s\.,&#39;"!()-]{1,100}$'
+                                value=row.event
+                                required)
+                        div
+                            label(for="day") Day of the Week:
+                            input(list="date"
+                                name="day"
+                                id="day"
+                                value=row.day
+                                pattern="(?i)^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$"
+                                required)
+                        div
+                            label(for="start") Start Time:
+                            input(type="time"
+                                value=row.start
+                                name="start"
+                                id="start"
+                                required)
+                        div
+                            label(for="end") End Time:
+                            input(type="time"
+                                value=row.end
+                                name="end"
+                                id="end"
+                                required)
+                        div
+                            label(for="phone") Phone:
+                            input(type="text"
+                                value=row.phone
+                                name="phone"
+                                id="phone"
+                                required)
+                        div
+                            label(for="location") Location:
+                            input(type="text"
+                                value=row.location
+                                name="location"
+                                id="location"
+                                required)
+                        div
+                            label(for="url") URL:
+                            input(type="url"
+                                value=row.url
+                                name="url"
+                                id="url"
+                                required)
+                        button(type="submit") Submit
+                        button(type="reset") Reset
+        include ../partials/footer

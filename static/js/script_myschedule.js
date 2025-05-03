@@ -19,7 +19,7 @@ $(document).ready(async () => {
             return acc;
         }, {});
 
-        // Create table rows with proper rowspans
+        // Create table rows with proper row spans
         dayOrder.forEach(day => {
             const dayEvents = groupedEvents[day] || [];
             if (dayEvents.length === 0) return;
@@ -89,6 +89,12 @@ $(document).on('click', '.delete-button', async function() {
     }
 });
 
+// Edit Button handling with event delegation
+$(document).on('click', '.edit-button', function() {
+    const eventId = $(this).attr('id');
+    window.location.assign(`/editSchedule/${eventId}`);
+});
+
 // XSS prevention
 function escapeHtml(unsafe) {
     if (typeof unsafe !== 'string') return unsafe;
@@ -109,6 +115,7 @@ function createRow(row) {
         <td>${escapeHtml(row.location)}</td>
         <td>${escapeHtml(row.phone)}</td>
         <td><a href="${escapeHtml(row.url)}" target="_blank">Link</a></td>
+        <td><button class="edit-button" id="${row.id}">Edit</button></td>
         <td><button class="delete-button" id="${row.id}">Delete</button></td>
     `;
 }
